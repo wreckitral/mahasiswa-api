@@ -22,6 +22,7 @@ func (s *APIServer) Run() error {
 
     server := http.Server{
         Addr: s.listenAddr,
+        Handler: router,
     }
 
     log.Println("mahasiswa-api Server is running on port:", s.listenAddr)
