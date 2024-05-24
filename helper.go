@@ -23,5 +23,9 @@ func makeHttpHandlerFunc(f apiFunc) http.HandlerFunc {
         if err := f(res, req); err != nil {
             writeJSON(res, http.StatusInternalServerError, apiError{err.Error()})
         }
+
+        if req.Method != "GET" {
+            writeJSON(res, http.StatusInternalServerError, apiError{"Wrong Method"})
+        }
     } 
 }
