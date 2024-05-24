@@ -1,9 +1,22 @@
 package main
 
 import (
-    "fmt"
+	"log"
+	"os"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
-    fmt.Println("hello world")
+    if err := godotenv.Load(".env"); err != nil {
+        log.Fatal(err)
+    }
+
+    port := ":" + os.Getenv("PORT")
+
+    server := NewAPIServer(port)
+    
+    if err := server.Run(); err != nil {
+        log.Fatal(err)
+    }
 }
