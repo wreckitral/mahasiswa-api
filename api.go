@@ -1,7 +1,9 @@
 package main
 
-import "net/http"
-
+import (
+	"log"
+	"net/http"
+)
 
 type APIServer struct {
     listenAddr string
@@ -13,3 +15,14 @@ func NewAPIServer(listenAddr string) *APIServer {
     }
 }
 
+func (s *APIServer) Run() error {
+    router := http.NewServeMux()
+
+    server := http.Server{
+        Addr: s.listenAddr,
+    }
+
+    log.Println("mahasiswa-api Server is running on port:", s.listenAddr)
+
+    return server.ListenAndServe()
+}
