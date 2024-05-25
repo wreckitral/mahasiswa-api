@@ -21,6 +21,7 @@ func (s *APIServer) Run() error {
     router := http.NewServeMux()
 
     router.HandleFunc("/rata-rata", makeHttpHandlerFunc(s.getRataRata))
+    router.HandleFunc("/rata-rata-suliet", makeHttpHandlerFunc(s.getRataRataSuliet))
 
     server := http.Server{
         Addr: s.listenAddr,
@@ -39,4 +40,13 @@ func(s *APIServer) getRataRata(res http.ResponseWriter, req *http.Request) error
     }
 
     return writeJSON(res, http.StatusOK, map[string]float64{"rata-rata IPK":avgIpk})
+}
+
+func(s *APIServer) getRataRataSuliet(res http.ResponseWriter, req *http.Request) error {
+    avgSuliet, err := s.Store.getRataRataSuliet()
+    if err != nil {
+        return err
+    }
+    
+    return writeJSON(res, http.StatusOK, map[string]float64{"rata-rata SULIET": avgSuliet})
 }
