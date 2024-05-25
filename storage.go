@@ -16,6 +16,9 @@ type Storage interface {
     GetRataRataSuliet() (float64, error)
     GetMahasiswaMaxIpk() (*Mahasiswa, error)
     GetMahasiswaMinIpk() (*Mahasiswa, error)
+    GetMahasiswaMaxSuliet() (*Mahasiswa, error)
+    GetMahasiswaMinSuliet() (*Mahasiswa, error)
+    GetPujianSangatMemuaskanMemuaskan() (int, int, int, error)
 }
 
 type MysqlStore struct {
@@ -102,4 +105,78 @@ func (s *MysqlStore) GetMahasiswaMinIpk() (*Mahasiswa, error) {
     }
 
     return nil, fmt.Errorf("Database error")
+}
+
+func (s *MysqlStore) GetMahasiswaMaxSuliet() (*Mahasiswa, error) {
+    query := `
+        SELECT * FROM ds_wisuda_tibil 
+        WHERE suliet = (SELECT MAX(suliet) FROM ds_wisuda_tibil)
+    ` 
+
+    row, err := s.db.Query(query)
+    if err != nil {
+        return nil, err
+    }
+    
+    for row.Next() {
+        return scanIntoMahasiswa(row)
+    }
+
+    return nil, fmt.Errorf("Database error")
+}
+
+func (s *MysqlStore) GetMahasiswaMinSuliet() (*Mahasiswa, error) {
+    query := `
+        SELECT * FROM ds_wisuda_tibil 
+        WHERE suliet = (SELECT MIN(suliet) FROM ds_wisuda_tibil)
+    ` 
+
+    row, err := s.db.Query(query)
+    if err != nil {
+        return nil, err
+    }
+    
+    for row.Next() {
+        return scanIntoMahasiswa(row)
+    }
+
+    return nil, fmt.Errorf("Database error")
+}
+
+func (s *MysqlStore) GetPujianSangatMemuaskanMemuaskan() (int, int, int, error) {
+    query := `
+        SELECT predikat, COUNT(*)
+        FROM ds_wisuda_tibil
+        GROUP BY predikat
+    `
+
+    rows, err := s.db.Query(query)
+    if err != nil {
+        return 0, 0, 0, err
+    }
+
+    // Initialize counts map with default values
+    counts := map[string]int{
+        "Dengan Pujian":     0,
+        "Sangat Memuaskan":  0,
+        "Memuaskan":         0,
+    }
+
+    for rows.Next() {
+        var predikat string
+        var count int
+
+        if err := rows.Scan(&predikat, &count); err != nil {
+            return 0, 0, 0, err
+        }
+
+        // Update the map with the actual counts
+        counts[predikat] = count
+    }
+
+    if err = rows.Err(); err != nil {
+        return 0, 0, 0, err
+    }
+
+    return counts["Dengan Pujian"], counts["Sangat Memuaskan"], counts["Memuaskan"], nil
 }
