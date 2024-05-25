@@ -22,6 +22,7 @@ func (s *APIServer) Run() error {
 
     router.HandleFunc("/rata-rata", makeHttpHandlerFunc(s.getRataRata))
     router.HandleFunc("/rata-rata-suliet", makeHttpHandlerFunc(s.getRataRataSuliet))
+    router.HandleFunc("/max-ipk", makeHttpHandlerFunc(s.getMahasiswaMaxIpk))
 
     server := http.Server{
         Addr: s.listenAddr,
@@ -39,14 +40,23 @@ func(s *APIServer) getRataRata(res http.ResponseWriter, req *http.Request) error
         return err
     }
 
-    return writeJSON(res, http.StatusOK, map[string]float64{"rata-rata IPK":avgIpk})
+    return writeJSON(res, http.StatusOK, map[string]float64{"rata-rata-ipk":avgIpk})
 }
 
 func(s *APIServer) getRataRataSuliet(res http.ResponseWriter, req *http.Request) error {
-    avgSuliet, err := s.Store.getRataRataSuliet()
+    avgSuliet, err := s.Store.GetRataRataSuliet()
     if err != nil {
         return err
     }
     
-    return writeJSON(res, http.StatusOK, map[string]float64{"rata-rata SULIET": avgSuliet})
+    return writeJSON(res, http.StatusOK, map[string]float64{"rata-rata-suliet": avgSuliet})
+}
+
+func(s *APIServer) getMahasiswaMaxIpk(res http.ResponseWriter, req *http.Request) error {
+    mahasiswa, err := s.Store.GetMahasiswaMaxIpk()
+    if err != nil {
+        return err
+    }
+
+    return writeJSON(res, http.StatusOK, mahasiswa)
 }
