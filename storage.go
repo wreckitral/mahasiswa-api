@@ -9,9 +9,12 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+
+
 type Storage interface {
     GetRataRata() (float64, error)
-    getRataRataSuliet() (float64, error)
+    GetRataRataSuliet() (float64, error)
+    GetMahasiswaMaxIpk() (*Mahasiswa, error)
 }
 
 type MysqlStore struct {
@@ -53,7 +56,7 @@ func (s *MysqlStore) GetRataRata() (float64, error) {
     return rata, nil
 }
 
-func (s *MysqlStore) getRataRataSuliet() (float64, error) {
+func (s *MysqlStore) GetRataRataSuliet() (float64, error) {
     query := "SELECT AVG(suliet) FROM ds_wisuda_tibil"
     var rataSuliet float64
 
@@ -63,6 +66,23 @@ func (s *MysqlStore) getRataRataSuliet() (float64, error) {
     }
 
     return rataSuliet, nil
+}
+
+func (s *MysqlStore) GetMahasiswaMaxIpk() (*Mahasiswa, error) {
+    query := `
+        SELECT * FROM ds_wisuda_tibil 
+        WHERE ipk = (SELECT MAX(ipk) FROM ds_wisuda_tibil)
+    ` 
+    row, err := s.db.Query(query)
+    if err != nil {
+        return nil, err
+    }
+    
+    for row.Next() {
+        return scanIntoMahasiswa(row)
+    }
+
+    return nil, fmt.Errorf("Database error")
 }
 
 
