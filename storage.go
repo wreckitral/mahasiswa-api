@@ -11,6 +11,7 @@ import (
 
 type Storage interface {
     GetRataRata() (float64, error)
+    getRataRataSuliet() (float64, error)
 }
 
 type MysqlStore struct {
@@ -51,5 +52,19 @@ func (s *MysqlStore) GetRataRata() (float64, error) {
 
     return rata, nil
 }
+
+func (s *MysqlStore) getRataRataSuliet() (float64, error) {
+    query := "SELECT AVG(suliet) FROM ds_wisuda_tibil"
+    var rataSuliet float64
+
+    err := s.db.QueryRow(query).Scan(&rataSuliet)
+    if err != nil {
+        return 0, err
+    }
+
+    return rataSuliet, nil
+}
+
+
 
 
