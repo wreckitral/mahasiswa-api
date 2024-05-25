@@ -33,5 +33,10 @@ func (s *APIServer) Run() error {
 }
 
 func(s *APIServer) getRataRata(res http.ResponseWriter, req *http.Request) error {
-    return writeJSON(res, http.StatusOK, map[string]string{"message":"rata-rata is called"})
+    avgIpk, err := s.Store.GetRataRata()
+    if err != nil {
+        return err
+    }
+
+    return writeJSON(res, http.StatusOK, map[string]float64{"rata-rata IPK":avgIpk})
 }
