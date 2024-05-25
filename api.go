@@ -27,6 +27,7 @@ func (s *APIServer) Run() error {
     router.HandleFunc("/max-suliet", makeHttpHandlerFunc(s.getMahasiswaMaxSuliet))
     router.HandleFunc("/min-suliet", makeHttpHandlerFunc(s.getMahasiswaMinSuliet))
     router.HandleFunc("/agregat", makeHttpHandlerFunc(s.getAgregat))
+    router.HandleFunc("/data-umur", makeHttpHandlerFunc(s.getDataUmur))
 
     server := http.Server{
         Addr: s.listenAddr,
@@ -103,4 +104,13 @@ func(s *APIServer) getAgregat(res http.ResponseWriter, req *http.Request) error 
         "sangat-memuaskan": sangatMemuaskan,
         "memuaskan": memuaskan,
     })
+}
+
+func(s *APIServer) getDataUmur(res http.ResponseWriter, req *http.Request) error {
+    dataUmur, err := s.Store.GetDataUmurMahasiswa()
+    if err != nil {
+        return err
+    }
+
+    return writeJSON(res, http.StatusOK, dataUmur)
 }
