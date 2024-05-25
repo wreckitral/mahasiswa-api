@@ -19,6 +19,7 @@ type Storage interface {
     GetMahasiswaMaxSuliet() (*Mahasiswa, error)
     GetMahasiswaMinSuliet() (*Mahasiswa, error)
     GetPujianSangatMemuaskanMemuaskan() (int, int, int, error)
+    GetDataUmurMahasiswa() ([]*DataUmur, error)
 }
 
 type MysqlStore struct {
@@ -155,7 +156,6 @@ func (s *MysqlStore) GetPujianSangatMemuaskanMemuaskan() (int, int, int, error) 
         return 0, 0, 0, err
     }
 
-    // Initialize counts map with default values
     counts := map[string]int{
         "Dengan Pujian":     0,
         "Sangat Memuaskan":  0,
@@ -170,7 +170,6 @@ func (s *MysqlStore) GetPujianSangatMemuaskanMemuaskan() (int, int, int, error) 
             return 0, 0, 0, err
         }
 
-        // Update the map with the actual counts
         counts[predikat] = count
     }
 
@@ -179,4 +178,27 @@ func (s *MysqlStore) GetPujianSangatMemuaskanMemuaskan() (int, int, int, error) 
     }
 
     return counts["Dengan Pujian"], counts["Sangat Memuaskan"], counts["Memuaskan"], nil
+}
+
+func (s *MysqlStore) GetDataUmurMahasiswa() ([]*DataUmur, error) {
+    query := `
+        SELECT CONCAT('NIM : ', nim, ' – ', nama, ' – ', TIMESTAMPDIFF(YEAR, tgllahir, CURDATE()), ' Tahun') AS description
+            FROM ds_wisuda_tibil
+    `
+    rows, err := s.db.Query(query)
+    if err != nil {
+        return nil, err
+    }
+
+    dataUmurs := []*DataUmur{}
+
+    for rows.Next() {
+        dataUmur, err := scanIntoDataUmur(rows)
+        if err != nil {
+            return nil, err
+        }
+        dataUmurs = append(dataUmurs, dataUmur)
+    }
+
+    return dataUmurs, nil
 }
