@@ -9,8 +9,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-
-
 type Storage interface {
     GetRataRata() (float64, error)
     GetRataRataSuliet() (float64, error)
@@ -19,6 +17,7 @@ type Storage interface {
     GetMahasiswaMaxSuliet() (*Mahasiswa, error)
     GetMahasiswaMinSuliet() (*Mahasiswa, error)
     GetPujianSangatMemuaskanMemuaskan() (int, int, int, error)
+    GetAgregatMasaStudi() (map[string]int, error)
     GetDataUmurMahasiswa() ([]*DataUmur, error)
 }
 
@@ -180,6 +179,35 @@ func (s *MysqlStore) GetPujianSangatMemuaskanMemuaskan() (int, int, int, error) 
     return counts["Dengan Pujian"], counts["Sangat Memuaskan"], counts["Memuaskan"], nil
 }
 
+func (s *MysqlStore) GetAgregatMasaStudi() (map[string]int, error) {
+    query := `
+    SELECT masastudi
+    FROM ds_wisuda_tibil;
+    `
+
+    rows, err := s.db.Query(query)
+    if err != nil {
+        return nil, err
+    }
+
+    counts := make(map[string]int)
+
+    for rows.Next() {
+        var masastudi string
+        if err := rows.Scan(&masastudi); err != nil {
+            return nil, err
+        }
+
+        counts[masastudi]++
+    }
+
+    if err = rows.Err(); err != nil {
+        return nil, err
+    }
+
+    return counts, nil
+}
+
 func (s *MysqlStore) GetDataUmurMahasiswa() ([]*DataUmur, error) {
     query := `
         SELECT CONCAT('NIM : ', nim, ' – ', nama, ' – ', TIMESTAMPDIFF(YEAR, tgllahir, CURDATE()), ' Tahun') AS description
@@ -202,3 +230,4 @@ func (s *MysqlStore) GetDataUmurMahasiswa() ([]*DataUmur, error) {
 
     return dataUmurs, nil
 }
+
