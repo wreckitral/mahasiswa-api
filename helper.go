@@ -46,3 +46,14 @@ func scanIntoMahasiswa(rows *sql.Rows) (*Mahasiswa, error) {
     return &mahasiswa, err
 
 }
+
+/*
+HELPER FUNCTION FOR AGE FETCHING
+*/
+func scanIntoDataUmur(rows *sql.Rows) (*DataUmur, error) {
+    dataUmur := DataUmur{}
+
+    err := rows.Scan(&dataUmur.UmurMahasiswa)
+
+    return &dataUmur, err
+}
