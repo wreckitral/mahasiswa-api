@@ -12,3 +12,6 @@ type Mahasiswa struct {
     Suliet    int `json:"suliet"`
 }
 
+type DataUmur struct {
+    UmurMahasiswa string `json:"umurMahasiswa"`
+}
