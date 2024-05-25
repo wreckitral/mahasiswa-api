@@ -23,6 +23,7 @@ func (s *APIServer) Run() error {
     router.HandleFunc("/rata-rata", makeHttpHandlerFunc(s.getRataRata))
     router.HandleFunc("/rata-rata-suliet", makeHttpHandlerFunc(s.getRataRataSuliet))
     router.HandleFunc("/max-ipk", makeHttpHandlerFunc(s.getMahasiswaMaxIpk))
+    router.HandleFunc("/min-ipk", makeHttpHandlerFunc(s.getMahasiswaMinIpk))
 
     server := http.Server{
         Addr: s.listenAddr,
@@ -54,6 +55,15 @@ func(s *APIServer) getRataRataSuliet(res http.ResponseWriter, req *http.Request)
 
 func(s *APIServer) getMahasiswaMaxIpk(res http.ResponseWriter, req *http.Request) error {
     mahasiswa, err := s.Store.GetMahasiswaMaxIpk()
+    if err != nil {
+        return err
+    }
+
+    return writeJSON(res, http.StatusOK, mahasiswa)
+}
+
+func(s *APIServer) getMahasiswaMinIpk(res http.ResponseWriter, req *http.Request) error {
+    mahasiswa, err := s.Store.GetMahasiswaMinIpk()
     if err != nil {
         return err
     }
