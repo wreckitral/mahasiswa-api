@@ -1,10 +1,14 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
 )
 
+/*
+HELPER FUNCTION API
+*/
 type apiFunc func(http.ResponseWriter, *http.Request) error
 
 type apiError struct {
@@ -28,4 +32,17 @@ func makeHttpHandlerFunc(f apiFunc) http.HandlerFunc {
             writeJSON(res, http.StatusInternalServerError, apiError{"Wrong Method"})
         }
     } 
+}
+
+/*
+HELPER FUNCTION FOR STORAGE
+*/
+func scanIntoMahasiswa(rows *sql.Rows) (*Mahasiswa, error) {
+    mahasiswa := Mahasiswa{}
+
+    err := rows.Scan(&mahasiswa.Nama, &mahasiswa.NIM, &mahasiswa.TmptLahir, 
+        &mahasiswa.TglLahir, &mahasiswa.IPK, &mahasiswa.Predikat, &mahasiswa.Prodi, &mahasiswa.MasaStudi, &mahasiswa.Suliet)
+
+    return &mahasiswa, err
+
 }
