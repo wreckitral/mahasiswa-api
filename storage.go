@@ -15,6 +15,7 @@ type Storage interface {
     GetRataRata() (float64, error)
     GetRataRataSuliet() (float64, error)
     GetMahasiswaMaxIpk() (*Mahasiswa, error)
+    GetMahasiswaMinIpk() (*Mahasiswa, error)
 }
 
 type MysqlStore struct {
@@ -85,6 +86,20 @@ func (s *MysqlStore) GetMahasiswaMaxIpk() (*Mahasiswa, error) {
     return nil, fmt.Errorf("Database error")
 }
 
+func (s *MysqlStore) GetMahasiswaMinIpk() (*Mahasiswa, error) {
+    query := `
+        SELECT * FROM ds_wisuda_tibil 
+        WHERE ipk = (SELECT MIN(ipk) FROM ds_wisuda_tibil)
+    ` 
 
+    row, err := s.db.Query(query)
+    if err != nil {
+        return nil, err
+    }
+    
+    for row.Next() {
+        return scanIntoMahasiswa(row)
+    }
 
-
+    return nil, fmt.Errorf("Database error")
+}
