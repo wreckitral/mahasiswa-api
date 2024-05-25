@@ -1,0 +1,21 @@
+services:
+  db:
+    image: mysql:latest
+    container_name: tugas-uas-web
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'db'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: 'password'
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - container-volume:/var/lib/mysql
+      - ./uas_webii.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  container-volume:
+
