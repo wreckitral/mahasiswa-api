@@ -14,6 +14,7 @@ Buatlah Sebuah API berbasis web untuk menampilkan informasi berikut:
 - Usia setiap mahasiswa `/data-umur`
 
 ### How to run
+set up docker, `docker-compose up`
 `make run`, server akan dijalankan pada port 1222.
 
 
